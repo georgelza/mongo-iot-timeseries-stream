@@ -1,0 +1,197 @@
+{
+    "generators": [
+        {
+            "name": "telemetryEventsGenerator",
+            "varsOnce": {
+                "maxEvents": {
+                    "_comment": "Maximum events/readings to generate.",
+                    "_gen": "env",
+                    "var": "maxEvents",
+                    "as": "integer"
+                },
+                "throttleMinTime":{
+                    "_comment": "Minimum sleep time between events (ms).",
+                    "_gen": "env",
+                    "var": "minSleep",
+                    "as": "integer"
+                },
+                "throttleMaxTime":{
+                    "_comment": "Maximum sleep time between events (ms).",
+                    "_gen": "env",
+                    "var": "maxSleep",
+                    "as": "integer"
+                },
+                "maxForking": {
+                    "_comment": "The maximum number of forks that will be spawned",
+                    "_gen": "env",
+                    "var": "maxForking",
+                    "as": "integer"
+                }
+            },
+            "fork": {
+                "key": {
+                    "_gen": "oneOf",
+                    "choices": {
+                        "_gen": "loadJsonFile",
+                        "file": "/workspace/devices_flat.json"
+                    }
+                },
+                "maxForks": {"_gen": "var", "var": "maxForking"}
+            },
+            "vars": {
+
+                "siteId": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["siteId"]
+                },
+                "siteName": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["name"]
+                },
+                "location": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["location"]
+                },  
+                "deviceId": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["deviceId"]
+                },
+                "deviceType": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["deviceType"]
+                },
+                "sensorId": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["sensorId"]
+                },
+                "sensorType": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["sensorType"]
+                },
+                "unit": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["unit"]
+                },
+                "minrange": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["min_range"]
+                },
+                "maxrange": {
+                    "_gen": "var", 
+                    "var": "forkKey",
+                    "path": ["max_range"]
+                },
+                "mean": {
+                    "_gen": "var",
+                    "var": "forkKey",
+                    "path": ["mean"]
+                },
+                "sd": {
+                    "_gen": "var", 
+                    "var": "forkKey",
+                    "path": ["sd"]
+                }
+            },
+
+            "topic": "telemetryEvents",
+
+            "key": {
+                "_gen": "var",
+                "var": "forkKey",
+                "path": ["sensorId"]
+            },  
+            "headers": [
+                {
+                    "key": "deviceType",
+                    "value": {"_gen": "var", "var": "deviceType"}
+                },
+                {
+                    "key": "sensorType",
+                    "value": {"_gen": "var", "var": "sensorType"}
+                },
+                {
+                    "key": "unit",
+                    "value": {"_gen": "var", "var": "unit"}
+                },
+
+                {
+                    "key": "minrange",
+                    "value": {"_gen": "var", "var": "minrange"}
+                },
+                {
+                    "key": "maxrange",
+                    "value": {"_gen": "var", "var": "maxrange"}
+                }          
+            ],
+
+            "value": {
+                "timestamp": {"_gen": "now"},  
+
+                "metadata": {
+                    "siteId": {"_gen": "var", "var": "siteId"},
+                    "deviceId": {"_gen": "var", "var": "deviceId"},
+                    "sensorId": {"_gen": "var", "var": "sensorId"},
+                    "site":{
+                        "siteName": {"_gen": "var", "var": "siteName"},
+                        "location": {"_gen": "var", "var": "location"}
+                    },
+                    "deviceType": {"_gen": "var", "var": "deviceType"},
+                    "sensor": {
+                        "unit": {"_gen": "var", "var": "unit"},
+                        "sensorType": {"_gen": "var", "var": "sensorType"},
+                        "minrange": {"_gen": "var", "var": "minrange"},
+                        "maxrange": {"_gen": "var", "var": "maxrange"},
+                        "mean": {"_gen": "var", "var": "mean"},
+                        "sd": {"_gen": "var", "var": "sd"}
+                    }
+                },
+
+                "measurement": {
+                    "_gen": "normalDistribution",
+                    "mean": {"_gen": "var", "var": "mean"},
+                    "sd": {"_gen": "var", "var": "sd"},
+                    "decimals": 4
+                }
+            },
+
+            "localConfigs": {
+                "throttleMs": {
+                    "_gen": "uniformDistribution",
+                    "bounds": [
+                        {"_gen": "var", "var": "throttleMinTime"},
+                        {"_gen": "var", "var": "throttleMaxTime"}
+                    ]
+                },
+                "maxEvents": {"_gen":"var", "var": "maxEvents"}
+            }
+        }
+    ],
+    "connections": {
+        "kafka": {
+            "kind": "kafka",
+            "topicPolicy": {
+                "policy": "manual"
+            },      
+            "producerConfigs": {
+                "bootstrap.servers": "broker:29092",
+                "schema.registry.url": "http://schema-registry:8081",
+                "key.serializer": "org.apache.kafka.common.serialization.StringSerializer", 
+                "value.serializer": "io.shadowtraffic.kafka.serdes.JsonSerializer"
+            },
+            "batchConfigs": {
+                "batchSize": 50,
+                "batchTimeoutMs": 10000  
+            }
+        }
+    }
+}
+  
