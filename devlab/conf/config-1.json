@@ -1,0 +1,248 @@
+{
+    "generators": [
+        {
+            "topic": "telemetryEvents",
+            "varsOnce": {
+                "maxEvents": {
+                    "_comment": "Maximum events/readings to generate.",
+                    "_gen": "env",
+                    "var": "maxEvents",
+                    "as": "integer"
+                },
+                "throttleMinTime":{
+                    "_comment": "Minimum sleep time between events (ms).",
+                    "_gen": "env",
+                    "var": "minSleep",
+                    "as": "integer"
+                },
+                "throttleMaxTime":{
+                    "_comment": "Maximum sleep time between events (ms).",
+                    "_gen": "env",
+                    "var": "maxSleep",
+                    "as": "integer"
+                },
+                "maxForking": {
+                    "_comment": "The maximum number of forks that will be spawned",
+                    "_gen": "env",
+                    "var": "maxForking",
+                    "as": "integer"
+                }
+            },
+            "vars": {
+                "sensors": {
+                    "_gen": "oneOf",
+                    "choices": [
+                        {
+                            "sensorId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 10000,
+                                "advanceBy": 10
+                            },
+                            "sensorType": "pressure",
+                            "unit": "Psi",
+                            "mean": 100,
+                            "sd": 15,
+                            "min_range": 50,
+                            "max_range": 150,
+                            "deviceId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 1100,
+                                "advanceBy": 10
+                            }
+                        },
+                        {
+                            "sensorId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 20000,
+                                "advanceBy": 10
+                            },
+                            "sensorType": "temperature",
+                            "unit": "Celsius",
+                            "mean": 35,
+                            "sd": 5,
+                            "min_range": 15,
+                            "max_range": 45,
+                            "deviceId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 1200,
+                                "advanceBy": 10
+                            }
+                        },
+                        {
+                            "sensorId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 30000,
+                                "advanceBy": 10
+                            },
+                            "sensorType": "voltage",
+                            "unit": "Volt",
+                            "mean": 220,
+                            "sd": 10,
+                            "min_range": 200,
+                            "max_range": 240,
+                            "deviceId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 1300,
+                                "advanceBy": 10
+                            }
+                        },
+                        {
+                            "sensorId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 40000,
+                                "advanceBy": 10
+                            },
+                            "sensorType": "current",
+                            "unit": "Amp",
+                            "mean": 10,
+                            "sd": 2,
+                            "min_range": 5,
+                            "max_range": 15,
+                            "deviceId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 1400,
+                                "advanceBy": 10
+                            }
+                        },
+                        {
+                            "sensorId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 50000,
+                                "advanceBy": 10
+                            },
+                            "sensorType": "revolutions",
+                            "unit": "Rpm",
+                            "mean": 1500,
+                            "sd": 100,
+                            "min_range": 1200,
+                            "max_range": 1800,
+                            "deviceId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 1500,
+                                "advanceBy": 10
+                            }
+                        },
+                        {
+                            "sensorId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 60000,
+                                "advanceBy": 10
+                            },
+                            "sensorType": "vibration",
+                            "unit": "m/s",
+                            "mean": 5,
+                            "sd": 2,
+                            "min_range": 2,
+                            "max_range": 8,
+                            "deviceId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 1600,
+                                "advanceBy": 10
+                            }
+                        }
+                    ]
+                },
+                "sites": {
+                    "_gen": "oneOf",
+                    "choices": [
+                        {
+                            "siteId": {
+                                "_gen": "sequentialInteger",
+                                "startingFrom": 100,
+                                "advanceBy": 10
+                            },
+                            "name": {
+                                "_gen": "string",
+                                "expr": "#{Company.name} Facility"
+                            },
+                            "location": {
+                                "latitude": {
+                                    "_gen": "uniformDistribution",
+                                    "bounds": [-90, 90],
+                                    "decimals": 6
+                                },
+                                "longitude": {
+                                    "_gen": "uniformDistribution",
+                                    "bounds": [-180, 180],
+                                    "decimals": 6
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+
+            "headers": [
+                {"key": "siteName",     "value": {"_gen": "var", "var": "sites", "path": ["name"]}},
+                {"key": "location",     "value": {"_gen": "var", "var": "sites", "path": ["location"]}},
+                {"key": "unit",         "value": {"_gen": "var", "var": "sensors", "path": ["unit"]}},
+                {"key": "sensorType",   "value": {"_gen": "var", "var": "sensors", "path": ["sensorType"]}},
+                {"key": "min_range",    "value": {"_gen": "var", "var": "sensors", "path": ["min_range"]}},
+                {"key": "max_range",    "value": {"_gen": "var", "var": "sensors", "path": ["max_range"]}}
+            ],
+
+            "key": {
+                "_gen": "var", "var": "sensors", "path": ["sensorId"]
+            },
+
+            "value": {
+                "timestamp": {"_gen": "now"},  
+
+                "metadata": {
+                    "siteId": {
+                        "_gen": "var",
+                        "var": "sites",
+                        "path": ["siteId"]
+                    },
+                    "deviceId": {
+                        "_gen": "var",
+                        "var": "sensors",
+                        "path": ["deviceId"]
+                    },
+                    "sensorId": {
+                        "_gen": "var",
+                        "var": "sensors",
+                        "path": ["sensorId"]
+                    }
+
+                },
+
+                "measurement": {
+                    "_gen": "normalDistribution",
+                    "mean": {"_gen": "var", "var": "sensors", "path": ["mean"]},
+                    "sd": {"_gen": "var", "var": "sensors", "path": ["sd"]},
+                    "decimals": 2
+                }
+            },
+
+            "localConfigs": {
+                "throttleMs": {
+                    "_gen": "uniformDistribution",
+                    "bounds": [
+                        {"_gen": "var", "var": "throttleMinTime"},
+                        {"_gen": "var", "var": "throttleMaxTime"}
+                    ]
+                },
+                "maxEvents": {"_gen":"var", "var": "maxEvents"}
+            }
+        }
+    ],
+    "connections": {
+        "kafka": {
+            "kind": "kafka",
+            "topicPolicy": {
+                "policy": "manual"
+            },      
+            "producerConfigs": {
+                "bootstrap.servers": "broker:29092",
+                "schema.registry.url": "http://schema-registry:8081",
+                "key.serializer": "org.apache.kafka.common.serialization.StringSerializer", 
+                "value.serializer": "io.shadowtraffic.kafka.serdes.JsonSerializer"
+            },
+            "batchConfigs": {
+                "batchSize": 50,
+                "batchTimeoutMs": 10000  
+            }
+        }
+    }
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "integer"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "siteId": {
+          "type": "integer"
+        },
+        "deviceId": {
+          "type": "integer"
+        },
+        "sensorId": {
+          "type": "integer"
+        },
+        "site": {
+          "siteName": {
+            "type": "string"
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "integer"
+              },
+              "longitude": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "deviceType": {
+          "type": "integer"
+        },
+        "sensor": {
+          "unit": {
+            "type": "string"
+          },
+          "sensorType": {
+            "type": "string"
+          },
+          "min_range": {
+            "type": "integer"
+          },
+          "max_range": {
+            "type": "integer"
+          },
+          "mean": {
+            "type": "integer"
+          },
+          "sd": {
+            "type": "integer"
+          }
+        }
+
+      },
+      "required": [
+        "siteId",
+        "deviceId",
+        "sensorId"
+      ]
+    },
+    "measurement": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "timestamp",
+    "metadata",
+    "measurement"
+  ]
+}
